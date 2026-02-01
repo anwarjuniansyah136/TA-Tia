@@ -1,0 +1,20 @@
+services:
+
+  inventory-core-postgres:
+    container_name: inventory-core-postgres
+    image: postgres:17.2
+    ports:
+      - "5433:5432"
+    environment:
+
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventory
+    volumes:
+      - inventory-core-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  inventory-core-rabbitmq-data:
+    name: inventory-core-rabbitmq-data
+  inventory-core-postgres-data:
+    name: inventory-core-postgres-data

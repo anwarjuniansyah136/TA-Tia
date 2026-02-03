@@ -15,10 +15,8 @@ public record ProductResponseDto(
 
         String description,
 
-        @JsonProperty("category_name")
         String categoryName,
 
-        @JsonProperty("category_id")
         String categoryId,
 
         BigDecimal price,
@@ -29,7 +27,6 @@ public record ProductResponseDto(
 
         boolean status,
 
-        @JsonProperty("image_url")
         String imageUrl
 ) {
 }

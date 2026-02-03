@@ -56,4 +56,10 @@ public class UserController {
             return ResponseEntity.internalServerError().body(GenericResponse.error(e.getMessage()));
         }
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteUsers(@PathVariable String id){
+        userService.deleteUsers(id);
+        return ResponseEntity.noContent().build();
+    }
 }

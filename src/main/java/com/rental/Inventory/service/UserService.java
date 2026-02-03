@@ -11,4 +11,5 @@ public interface UserService {
     public LoginResponseDto login(LoginRequestDto dto);
     public List<Users> getAllUsers();
     public Users register(RegisterRequestDto dto);
+    void deleteUsers(String id);
 }

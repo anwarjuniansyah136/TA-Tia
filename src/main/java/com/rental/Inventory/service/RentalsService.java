@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.rental.Inventory.dto.request.RentalsRequestDto;
 import com.rental.Inventory.dto.response.RentalsResponseDto;
+import com.rental.Inventory.entity.RentalDetail;
 
 public interface RentalsService {
 
@@ -22,5 +23,9 @@ public interface RentalsService {
     RentalsResponseDto getById(String id);
 
     List<RentalsResponseDto> getByStatus();
+
+    List<RentalDetail> getTodayRentalDetails();
+
+    List<RentalDetail> findForWarehouse();
 
 }

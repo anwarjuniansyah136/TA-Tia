@@ -66,4 +66,16 @@ public class RentalController {
     public ResponseEntity<Object> findByStatus(){
         return ResponseEntity.ok(rentalsService.getByStatus());
     }
+
+    @GetMapping("/report")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<Object> report(){
+        return ResponseEntity.ok(rentalsService.getTodayRentalDetails());
+    }
+
+    @GetMapping("/find-for-warehouse")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<Object> findForWarehouse(){
+        return ResponseEntity.ok(rentalsService.findForWarehouse());
+    }
 }

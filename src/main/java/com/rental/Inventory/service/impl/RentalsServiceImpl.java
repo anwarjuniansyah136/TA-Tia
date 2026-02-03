@@ -243,6 +243,21 @@ public class RentalsServiceImpl implements RentalsService {
         return detailRepository.findByRentalAndDetailStatus("ONGOING", "UNPAID").stream().map(this::toRentalsResponseDto).toList();
     }
 
+    @Override
+    public List<RentalDetail> getTodayRentalDetails() {
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime start = today.atStartOfDay();           // 00:00 hari ini
+        LocalDateTime end = today.plusDays(1).atStartOfDay(); // 00:00 besok
+
+        return detailRepository.findTodayRentalDetails(start, end);
+    }
+
+    @Override
+    public List<RentalDetail> findForWarehouse() {
+        return detailRepository.findAll();
+    }
+
     private RentalsResponseDto toRentalsResponseDto(Rentals rentals) {
         return RentalsResponseDto.builder()
                 .id(rentals.getId())

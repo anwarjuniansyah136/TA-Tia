@@ -72,5 +72,10 @@ public class UserServiceImpl implements UserService{
         users.setUpdateAt(LocalDateTime.now());
         return userRepository.save(users);
     }
-    
+
+    @Override
+    public void deleteUsers(String id) {
+        userRepository.deleteById(id);
+    }
+
 }

@@ -10,7 +10,7 @@ import com.rental.Inventory.entity.RentalDetail;
 import com.rental.Inventory.service.RentalDetailService;
 
 @RestController
-@RequestMapping("/api/rental-details")
+@RequestMapping("/api/v1/rental-details")
 public class RentalDetailController {
 
     private final RentalDetailService rentalDetailService;

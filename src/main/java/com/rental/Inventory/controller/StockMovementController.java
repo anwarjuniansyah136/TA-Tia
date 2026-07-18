@@ -10,7 +10,7 @@ import com.rental.Inventory.entity.StockMovements;
 import com.rental.Inventory.service.StockMovementService;
 
 @RestController
-@RequestMapping("/api/stock-movements")
+@RequestMapping("/api/v1/stock-movements")
 public class StockMovementController {
 
     private final StockMovementService stockMovementsService;

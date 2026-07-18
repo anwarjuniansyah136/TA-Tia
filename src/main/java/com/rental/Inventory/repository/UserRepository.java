@@ -9,5 +9,6 @@ import com.rental.Inventory.entity.Users;
 public interface UserRepository extends JpaRepository<Users, String>{
 
     Optional<Users> findByUsername(String username);
+    boolean existsByUsername(String username);
     
 }

@@ -34,15 +34,14 @@ public class JwtFilter extends OncePerRequestFilter{
             throws ServletException, IOException {
 
         try {
-            String accessToken = jwtUtil.resolveToken(request);
-            System.out.println(accessToken);
-            if (accessToken == null) {
+            var accessToken = jwtUtil.resolveToken(request);
+            if (accessToken.isEmpty()) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            Claims claims = jwtUtil.resolveClaims(request);
-            if (claims != null && jwtUtil.validateClaims(claims)) {
+            Claims claims = jwtUtil.resolveClaims(accessToken.get());
+            if (jwtUtil.validateClaims(claims)) {
                 String username = claims.getSubject();
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
                         username, "", Collections.singleton(new SimpleGrantedAuthority(claims.get("role").toString())));

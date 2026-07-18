@@ -10,7 +10,7 @@ import com.rental.Inventory.entity.DailyReports;
 import com.rental.Inventory.service.DailyReportsService;
 
 @RestController
-@RequestMapping("/api/daily-reports")
+@RequestMapping("/api/v1/daily-reports")
 public class DailyReportsController {
 
     private final DailyReportsService dailyReportsService;

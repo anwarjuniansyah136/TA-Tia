@@ -48,7 +48,7 @@ public class UserController {
     @GetMapping("/find-all")
     public ResponseEntity<Object> findAllUsers(){
         try{
-            return ResponseEntity.ok().body(GenericResponse.success(userService.getAllUsers(),"fuck"));
+            return ResponseEntity.ok().body(GenericResponse.success(userService.getAllUsers(), "success"));
         }catch (ResponseStatusException e){
             return ResponseEntity.status(e.getStatusCode()).body(GenericResponse.error(e.getReason()));
         }

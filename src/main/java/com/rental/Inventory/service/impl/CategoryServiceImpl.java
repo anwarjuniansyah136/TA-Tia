@@ -44,7 +44,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getAll() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAll().stream()
+                .filter(category -> !Boolean.FALSE.equals(category.getStatus()))
+                .toList();
     }
 
     @Override
@@ -52,6 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category existing = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        categoryRepository.delete(existing);
+        existing.setStatus(false);
+        categoryRepository.save(existing);
     }
 }

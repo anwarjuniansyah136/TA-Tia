@@ -2,8 +2,6 @@ package com.rental.Inventory.service;
 
 import com.rental.Inventory.dto.request.ProductRequestDto;
 import com.rental.Inventory.dto.response.ProductResponseDto;
-import com.rental.Inventory.entity.Products;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,5 +16,7 @@ public interface ProductService {
     List<ProductResponseDto> getAll();
 
     void delete(String id);
+
+    ProductResponseDto updateImage(String id, String fileName);
 
 }

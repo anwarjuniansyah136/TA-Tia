@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public LoginResponseDto login(LoginRequestDto dto) {
         Users user = userRepository.findByUsername(dto.username()).orElseThrow();
-        if (user != null) {
+        if (user != null && user.isStatus()) {
             boolean isMatch = passwordEncoder.matches(dto.password(), user.getPassword());
 
             if(isMatch){
@@ -52,11 +52,20 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<Users> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAll().stream().filter(Users::isStatus).toList();
     }
 
     @Override
     public Users register(RegisterRequestDto dto) {
+        if (dto.fullName() == null || dto.fullName().isBlank()
+                || dto.username() == null || dto.username().isBlank()
+                || dto.password() == null || dto.password().length() < 8) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "full name, valid username, and password of at least 8 characters are required");
+        }
+        if (userRepository.existsByUsername(dto.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "username already registered");
+        }
         Users users = new Users();
         users.setFullName(dto.fullName());
         users.setUsername(dto.username());
@@ -75,7 +84,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void deleteUsers(String id) {
-        userRepository.deleteById(id);
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user not found"));
+        user.setStatus(false);
+        user.setUpdateAt(LocalDateTime.now());
+        userRepository.save(user);
     }
 
 }

@@ -5,6 +5,7 @@ import com.rental.Inventory.exception.CustomUnAuthorizeException;
 import com.rental.Inventory.repository.RolesRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -71,27 +72,30 @@ public class SecurityConfig {
                                                         "/customer/upload-customer-photo",
                                                         "/product/get",
                                                         "/category/get",
-                                                        "/api/v1/signup",
-                                                        "/api/v1/find-all",
                                                         "/api/v1/signin",
-                                                        "/api/v1/categories/**",
-                                                        "/api/v1/daily-reports/**",
-                                                        "/api/v1/products/**",
-                                                        "/api/v1/rental-details/**",
-                                                        "/api/v1/stock-movements/**",
-                                                        "/api/v1/history/**"
+                                                        "/images/products/**",
+                                                        "/error"
                                                 )
                                                 .permitAll()
-//                                                 .requestMatchers(
-//                                                                 "/api/v1/rentals"
-//                                                 )
-//                                                 .hasAnyAuthority(String.valueOf(rolesRepository.findByRoleName("cashier").orElseThrow()))
-                                                // .requestMatchers(
-                                                //                 "/product/**",
-                                                //                 "/category/**")
-                                                // .hasAnyAuthority(RolesConstant.WAREHOUSE_ROLE)
-                                                // .requestMatchers("/transaction/{id}","/transaction/view")
-                                                // .hasAuthority(RolesConstant.ACCOUNTANT_ROLE)
+                                                .requestMatchers(HttpMethod.GET,
+                                                        "/api/v1/products/**",
+                                                        "/api/v1/categories/**")
+                                                .permitAll()
+                                                .requestMatchers(
+                                                        "/api/v1/signup",
+                                                        "/api/v1/find-all",
+                                                        "/api/v1/delete/**")
+                                                .hasAuthority("owner")
+                                                .requestMatchers(
+                                                        "/api/v1/procurements/**",
+                                                        "/api/v1/rentals/**",
+                                                        "/api/v1/products/**",
+                                                        "/api/v1/categories/**",
+                                                        "/api/v1/history/**",
+                                                        "/api/v1/daily-reports/**")
+                                                .hasAnyAuthority("owner", "cashier")
+                                                .requestMatchers("/api/v1/stock-movements/**")
+                                                .hasAnyAuthority("owner", "cashier", "warehouse")
                                                  .anyRequest().authenticated()
                                                 )
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class);

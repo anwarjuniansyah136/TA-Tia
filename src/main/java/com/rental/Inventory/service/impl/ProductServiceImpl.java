@@ -122,14 +122,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDto> getAll() {
-        return productRepository.findAll().stream().map(this::toProductResponseDto).toList();
+        return productRepository.findAll().stream()
+                .filter(Products::isStatus)
+                .map(this::toProductResponseDto)
+                .toList();
     }
 
     @Override
     public void delete(String id) {
         Products product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        productRepository.delete(product);
+        product.setStatus(false);
+        productRepository.save(product);
+    }
+
+    @Override
+    public ProductResponseDto updateImage(String id, String fileName) {
+        Products product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setImageUrl(fileName);
+        return toProductResponseDto(productRepository.save(product));
     }
 
     private ProductResponseDto toProductResponseDto(Products products){

@@ -1,8 +1,12 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
   datasource:
-    url: jdbc:postgresql://localhost:5433/inventory
-    username: postgres
-    password: postgres
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/inventory}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -16,3 +20,9 @@ spring:
         format_sql: true
         jdbc:
           time_zone: Asia/Jakarta
+
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  product-image-directory: ${PRODUCT_IMAGE_DIR:uploads/products}

@@ -1,15 +1,13 @@
 package com.rental.Inventory.controller;
 
-import java.util.List;
-
 import com.rental.Inventory.dto.request.ProductRequestDto;
 import com.rental.Inventory.dto.response.ProductResponseDto;
+import com.rental.Inventory.service.ProductImageStorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.rental.Inventory.entity.Products;
 import com.rental.Inventory.service.ProductService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,9 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductImageStorageService productImageStorageService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService,
+                             ProductImageStorageService productImageStorageService) {
         this.productService = productService;
+        this.productImageStorageService = productImageStorageService;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -56,5 +57,12 @@ public class ProductController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/upload-photo-product/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> uploadImage(@PathVariable String id,
+                                              @RequestParam("file") MultipartFile file) {
+        String fileName = productImageStorageService.store(file);
+        return ResponseEntity.ok(productService.updateImage(id, fileName));
     }
 }

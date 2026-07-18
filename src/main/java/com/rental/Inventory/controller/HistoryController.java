@@ -25,6 +25,8 @@ public class HistoryController {
 
     @GetMapping("/find-all-for-this-month")
     public ResponseEntity<Object> findAllForThisMonth(){
-        return null;
+        return ResponseEntity.ok().body(
+                GenericResponse.success(historyService.findAllForCurrentMonth(), "success")
+        );
     }
 }

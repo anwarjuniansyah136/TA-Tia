@@ -64,7 +64,18 @@ public class RentalsServiceImpl implements RentalsService {
         rentals.setRentalDate(toLocalDateTime(rental.rentalDate()));
         rentals.setEndDate(toLocalDateTime(rental.endDate()));
         rentals.setStatus("ONGOING");
-        rentals.setTotalAmount(product.getPurchasePrice().multiply(new BigDecimal(rental.quantity())).multiply(new BigDecimal(calculateDays(rentals.getRentalDate(), rentals.getEndDate()))));
+        if (!product.isStatus()) {
+            throw new RuntimeException("Product is inactive");
+        }
+        if (rental.quantity() <= 0) {
+            throw new RuntimeException("Quantity must be greater than zero");
+        }
+        if (rentals.getEndDate().isBefore(rentals.getRentalDate())) {
+            throw new RuntimeException("End date must not be before rental date");
+        }
+        rentals.setTotalAmount(product.getPrice()
+                .multiply(BigDecimal.valueOf(rental.quantity()))
+                .multiply(BigDecimal.valueOf(calculateDays(rentals.getRentalDate(), rentals.getEndDate()))));
         rentals.setRenterName(rental.renterName());
         rentals.setRenterPhone(rental.renterPhone());
 
@@ -116,7 +127,7 @@ public class RentalsServiceImpl implements RentalsService {
         history.setProductCategory(product.getCategory().getName());
         history.setStatusPayment("UNPAID");
         history.setStatusProduct("ONGOING");
-        history.setSubtotalPrice(rental.totalAmount());
+        history.setSubtotalPrice(rentals.getTotalAmount());
         history.setRentalDate(toLocalDateTime(rental.rentalDate()));
 
         historyRepository.save(history);
@@ -162,7 +173,8 @@ public class RentalsServiceImpl implements RentalsService {
 
         stockMovementRepository.save(sm);
 
-        History history = historyRepository.findByInvoiceNumber(rental.getInvoiceNumber());
+        History history = historyRepository.findByInvoiceNumber(rental.getInvoiceNumber())
+                .orElseThrow(() -> new RuntimeException("Rental history not found"));
         history.setPriceOfProduct(product.getPrice());
         history.setProductName(product.getName());
         history.setProductCategory(product.getCategory().getName());
@@ -206,7 +218,8 @@ public class RentalsServiceImpl implements RentalsService {
 
         stockMovementRepository.save(sm);
 
-        History history = historyRepository.findByInvoiceNumber(invoiceId);
+        History history = historyRepository.findByInvoiceNumber(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Rental history not found"));
         history.setStatusPayment("RETURN");
         history.setStatusProduct("RETURN");
 
@@ -225,7 +238,8 @@ public class RentalsServiceImpl implements RentalsService {
         detail.setStatus("PAID");
         detailRepository.save(detail);
 
-        History history = historyRepository.findByInvoiceNumber(rentals.getInvoiceNumber());
+        History history = historyRepository.findByInvoiceNumber(rentals.getInvoiceNumber())
+                .orElseThrow(() -> new RuntimeException("Rental history not found"));
         history.setStatusPayment("PAID");
         history.setStatusProduct("ONRENT");
         historyRepository.save(history);
@@ -298,7 +312,7 @@ public class RentalsServiceImpl implements RentalsService {
 
     public static LocalDateTime toLocalDateTime(String dateTime) {
         if (dateTime == null || dateTime.isBlank()) {
-            return null;
+            throw new IllegalArgumentException("Rental date is required");
         }
 
         if (dateTime.length() == 10) {

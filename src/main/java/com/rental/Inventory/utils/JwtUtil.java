@@ -1,6 +1,7 @@
 package com.rental.Inventory.utils;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
@@ -17,9 +18,9 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class JwtUtil {
     private String secretKey = "ecommerce";
-    private Long accessTokenValidaty = 60 * 60 * 1000L;
+    private Long accessTokenValidityMinutes = 60L;
     private final String TOKEN_HEADER = "Authorization";
-    private final String TOKEN_PREFIX = "Bearer";
+    private final String TOKEN_PREFIX = "Bearer ";
     private JwtParser jwtParser;
 
     public JwtUtil(){
@@ -29,10 +30,10 @@ public class JwtUtil {
     public String generateToken(Users auth){
         Claims claims = Jwts.claims().setSubject(auth.getUsername());
         claims.put("email", auth.getUsername());
-        claims.put("role", auth.getRoles());
+        claims.put("role", auth.getRoles().getRoleName().toLowerCase());
 
         Date tokenCreateTime = new Date();
-        Date tokenValidaty = new Date(tokenCreateTime.getTime()+TimeUnit.MINUTES.toMillis(accessTokenValidaty));
+        Date tokenValidaty = new Date(tokenCreateTime.getTime()+TimeUnit.MINUTES.toMillis(accessTokenValidityMinutes));
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -45,26 +46,20 @@ public class JwtUtil {
         return jwtParser.parseClaimsJws(token).getBody();
     }
 
-    public String resolveToken(HttpServletRequest req){
+    public Optional<String> resolveToken(HttpServletRequest req){
         String bearerToken = req.getHeader(TOKEN_HEADER);
         if(bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)){
-            return bearerToken.substring(TOKEN_PREFIX.length());
+            return Optional.of(bearerToken.substring(TOKEN_PREFIX.length()));
         }
-        return null;
+        return Optional.empty();
     }
 
-    public Claims resolveClaims(HttpServletRequest req){
+    public Claims resolveClaims(String token){
         try {
-            String token = resolveToken(req);
-            if(token != null){
-                return parseJwtClaims(token);
-            }
-            return null;
+            return parseJwtClaims(token);
         } catch (ExpiredJwtException e) {
-            req.setAttribute("expired", e.getMessage());
             throw e;
         } catch(Exception e){
-            req.setAttribute("invalid", e.getMessage());
             throw e;
         }
     }

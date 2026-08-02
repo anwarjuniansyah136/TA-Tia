@@ -49,6 +49,7 @@ public class RentalsServiceImpl implements RentalsService {
     }
 
     @Override
+    @Transactional
     public RentalsResponseDto create(RentalsRequestDto rental) {
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
         var username = user.getName();
@@ -69,6 +70,9 @@ public class RentalsServiceImpl implements RentalsService {
         }
         if (rental.quantity() <= 0) {
             throw new RuntimeException("Quantity must be greater than zero");
+        }
+        if (product.getStock() < rental.quantity()) {
+            throw new RuntimeException("Insufficient stock. Available stock: " + product.getStock());
         }
         if (rentals.getEndDate().isBefore(rentals.getRentalDate())) {
             throw new RuntimeException("End date must not be before rental date");
@@ -99,13 +103,7 @@ public class RentalsServiceImpl implements RentalsService {
         detailRepository.save(detail);
 
 
-        var qty = product.getStock();
         product.setStock(product.getStock() - rental.quantity());
-        if (product.getStock() < 0){
-            product.setStock(qty);
-            productRepository.save(product);
-            throw new RuntimeException("insufficient stock");
-        }
         productRepository.save(product);
 
         StockMovements sm = new StockMovements();
@@ -132,12 +130,12 @@ public class RentalsServiceImpl implements RentalsService {
 
         historyRepository.save(history);
 
-        return toRentalsResponseDto(rentals);
+        return toRentalsResponseDto(detail);
     }
 
     @Override
     public List<RentalsResponseDto> getAll() {
-        return rentalsRepository
+        return detailRepository
                 .findAll()
                 .stream()
                 .map(this::toRentalsResponseDto)
@@ -183,7 +181,8 @@ public class RentalsServiceImpl implements RentalsService {
 
         historyRepository.save(history);
 
-        return toRentalsResponseDto(rentalsRepository.save(rental));
+        rentalsRepository.save(rental);
+        return toRentalsResponseDto(detail);
     }
 
     @Override
@@ -225,7 +224,7 @@ public class RentalsServiceImpl implements RentalsService {
 
         historyRepository.save(history);
 
-        return toRentalsResponseDto(rentals);
+        return toRentalsResponseDto(detail);
     }
 
     @Override
@@ -244,12 +243,16 @@ public class RentalsServiceImpl implements RentalsService {
         history.setStatusProduct("ONRENT");
         historyRepository.save(history);
 
-        return toRentalsResponseDto(rentals);
+        return toRentalsResponseDto(detail);
     }
 
     @Override
     public RentalsResponseDto getById(String id) {
-        return toRentalsResponseDto(rentalsRepository.findById(id).orElseThrow(() -> {throw new RuntimeException("Rental not found");}));
+        Rentals rental = rentalsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rental not found"));
+        RentalDetail detail = detailRepository.findByRentals(rental)
+                .orElseThrow(() -> new RuntimeException("Rental detail not found"));
+        return toRentalsResponseDto(detail);
     }
 
     @Override
@@ -269,7 +272,7 @@ public class RentalsServiceImpl implements RentalsService {
 
     @Override
     public List<RentalDetail> findForWarehouse() {
-        return detailRepository.findAll();
+        return detailRepository.findByRentalAndDetailStatus("ONRENT", "PAID");
     }
 
     private RentalsResponseDto toRentalsResponseDto(Rentals rentals) {
@@ -282,6 +285,9 @@ public class RentalsServiceImpl implements RentalsService {
                 .status(rentals.getStatus())
                 .renterName(rentals.getRenterName())
                 .renterPhone(rentals.getRenterPhone())
+                .productName("-")
+                .quantity(0)
+                .paymentStatus("-")
                 .build();
     }
 
@@ -295,6 +301,9 @@ public class RentalsServiceImpl implements RentalsService {
                 .status(detail.getRentals().getStatus())
                 .renterName(detail.getRentals().getRenterName())
                 .renterPhone(detail.getRentals().getRenterPhone())
+                .productName(detail.getProducts().getName())
+                .quantity(detail.getQuantity())
+                .paymentStatus(detail.getStatus())
                 .build();
     }
 

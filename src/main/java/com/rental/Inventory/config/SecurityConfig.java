@@ -86,6 +86,9 @@ public class SecurityConfig {
                                                         "/api/v1/find-all",
                                                         "/api/v1/delete/**")
                                                 .hasAuthority("owner")
+                                                .requestMatchers(HttpMethod.GET,
+                                                        "/api/v1/rentals/find-for-warehouse")
+                                                .hasAnyAuthority("owner", "warehouse")
                                                 .requestMatchers(
                                                         "/api/v1/procurements/**",
                                                         "/api/v1/rentals/**",

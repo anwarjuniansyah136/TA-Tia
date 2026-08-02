@@ -20,6 +20,12 @@ public record RentalsResponseDto(
 
         String renterName,
 
-        String renterPhone
+        String renterPhone,
+
+        String productName,
+
+        long quantity,
+
+        String paymentStatus
 ) {
 }

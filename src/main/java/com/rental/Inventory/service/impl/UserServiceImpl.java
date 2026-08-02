@@ -63,10 +63,10 @@ public class UserServiceImpl implements UserService{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "full name, valid username, and password of at least 8 characters are required");
         }
-        if (userRepository.existsByUsername(dto.username())) {
+        Users users = userRepository.findByUsername(dto.username()).orElseGet(Users::new);
+        if (users.getId() != null && users.isStatus()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "username already registered");
         }
-        Users users = new Users();
         users.setFullName(dto.fullName());
         users.setUsername(dto.username());
         users.setPassword(passwordEncoder.encode(dto.password()));

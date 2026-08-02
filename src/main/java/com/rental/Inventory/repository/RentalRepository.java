@@ -12,4 +12,5 @@ public interface RentalRepository extends JpaRepository<Rentals, String> {
     Optional<Rentals> findByInvoiceNumber(long invoiceId);
 
     List<Rentals> findByStatusNotIn(List<String> statuses);
+    long countByStatusNotIn(List<String> statuses);
 }

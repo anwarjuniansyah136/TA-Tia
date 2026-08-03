@@ -7,7 +7,7 @@ spring:
 #    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/inventory?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia%2FJakarta}
     url: ${DATABASE_URL:jdbc:mysql://localhost:3306/inventory}
     username: ${DATABASE_USERNAME:root}
-    password: ${DATABASE_PASSWORD:root}
+    password: ${DATABASE_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

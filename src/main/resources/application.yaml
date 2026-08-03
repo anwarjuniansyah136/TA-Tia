@@ -4,7 +4,7 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
   datasource:
-#    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/inventory?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia%2FJakarta}
+#    url: ${DATABASE_URL:jdbc:mysql://localhost:3307/inventory?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia%2FJakarta}
     url: ${DATABASE_URL:jdbc:mysql://localhost:3306/inventory}
     username: ${DATABASE_USERNAME:root}
     password: ${DATABASE_PASSWORD:}
